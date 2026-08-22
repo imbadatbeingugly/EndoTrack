@@ -2,6 +2,8 @@ import os
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 import google.generativeai as genai
 
@@ -15,7 +17,7 @@ app = FastAPI(
 # Configure CORS Middleware for Render deployment and local React development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with your specific frontend domain on Render
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,14 +46,13 @@ class SummaryRequest(BaseModel):
 class QARequest(BaseModel):
     question: str
 
-# In-Memory Database (Mock storage for rapid development & testing)
+# In-Memory Database
 db_symptom_logs = []
 
 # --- API Routes ---
 
 @app.get("/api/health")
 def health_check():
-    """Health check endpoint to verify backend service status on Render."""
     return {
         "status": "online",
         "service": "EndoTrack Backend",
@@ -60,7 +61,6 @@ def health_check():
 
 @app.post("/api/symptoms")
 def create_symptom_log(entry: SymptomEntry):
-    """Logs a daily symptom entry from the React frontend."""
     db_symptom_logs.append(entry.model_dump())
     return {
         "status": "success",
@@ -70,7 +70,6 @@ def create_symptom_log(entry: SymptomEntry):
 
 @app.get("/api/symptoms")
 def get_symptom_logs():
-    """Retrieves all logged symptom entries for charting and history."""
     return {
         "status": "success",
         "data": db_symptom_logs
@@ -78,10 +77,6 @@ def get_symptom_logs():
 
 @app.post("/api/generate-summary")
 def generate_doctor_summary(payload: SummaryRequest):
-    """
-    Synthesizes historical symptom logs into a structured 
-    'Doctor Consultation Brief' using Gemini 1.5 Flash.
-    """
     if not GEMINI_API_KEY:
         raise HTTPException(
             status_code=500, 
@@ -94,7 +89,6 @@ def generate_doctor_summary(payload: SummaryRequest):
             detail="No symptom logs provided for analysis."
         )
 
-    # Format entries into structured text for LLM prompting
     logs_text = "\n".join([
         f"- Date: {e.date} (Cycle Day {e.cycle_day}): Pain Severity {e.pain_level}/10 [{e.primary_location}], GI Distress: {e.gi_distress}, Fatigue: {e.fatigue_level}/10. Notes: '{e.notes}'"
         for e in payload.entries
@@ -130,10 +124,6 @@ def generate_doctor_summary(payload: SummaryRequest):
 
 @app.post("/api/chat-qa")
 def educational_qa(req: QARequest):
-    """
-    Provides evidence-based educational Q&A regarding endometriosis 
-    with medical disclaimers and safety guardrails.
-    """
     if not GEMINI_API_KEY:
         raise HTTPException(
             status_code=500, 
@@ -157,4 +147,38 @@ def educational_qa(req: QARequest):
         raise HTTPException(
             status_code=500, 
             detail=f"AI Service Error: {str(err)}"
+        )
+
+# --- Static Files & Index Redirect Routing ---
+
+# Path to the directory where static assets reside (e.g. frontend root or build output dist directory)
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
+
+# Mount compiled assets if dist/assets exists, otherwise fall back to static root directory
+assets_path = os.path.join(STATIC_DIR, "dist", "assets")
+if os.path.exists(assets_path):
+    app.mount("/assets", StaticFiles(directory=assets_path), name="assets")
+
+@app.get("/{full_path:path}")
+def serve_frontend(full_path: str):
+    """
+    Serves static frontend files or falls back to index.html 
+    for root redirects and client-side routing.
+    """
+    # Exclude API endpoints from static file fallback
+    if full_path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="API Endpoint Not Found")
+
+    # Path to index.html (checks dist folder for Vite builds or root directory)
+    dist_index = os.path.join(STATIC_DIR, "dist", "index.html")
+    root_index = os.path.join(STATIC_DIR, "index.html")
+
+    if os.path.exists(dist_index):
+        return FileResponse(dist_index)
+    elif os.path.exists(root_index):
+        return FileResponse(root_index)
+    else:
+        raise HTTPException(
+            status_code=404, 
+            detail="index.html not found. Please ensure the frontend build directory exists."
         )
