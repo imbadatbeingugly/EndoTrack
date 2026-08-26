@@ -82,7 +82,7 @@ def generate_doctor_summary(payload: SummaryRequest):
     """
 
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-3.5-flash")
         response = model.generate_content(prompt)
         return {"status": "success", "summary": response.text}
     except Exception as err:
