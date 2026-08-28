@@ -99,7 +99,7 @@ def educational_qa(req: QARequest):
     )
 
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash", system_instruction=system_instruction)
+        model = genai.GenerativeModel("gemini-3.5-flash", system_instruction=system_instruction)
         response = model.generate_content(req.question)
         return {"status": "success", "answer": response.text}
     except Exception as err:
