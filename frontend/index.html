@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EndoTrack</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Recharts -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+<script src="https://unpkg.com/recharts@2.12.0/umd/Recharts.js"></script>
+<!-- Babel for in-browser JSX parsing -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "inverse-surface": "#223243",
+            "text-primary": "#1A2332",
+            "on-error-container": "#93000a",
+            "inverse-primary": "#9bcfd8",
+            "on-secondary-fixed-variant": "#004e59",
+            "outline-variant": "#c0c8ca",
+            "coral-subtle": "#FDE8E9",
+            "border-soft": "#E2E8F0",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed": "#001f24",
+            "surface-container-highest": "#d3e4fb",
+            "secondary": "#006876",
+            "surface-dim": "#cbdbf3",
+            "surface-tint": "#31666e",
+            "on-tertiary": "#ffffff",
+            "on-surface": "#0c1d2e",
+            "on-tertiary-fixed": "#121d1f",
+            "surface": "#f8f9ff",
+            "on-secondary-container": "#006d7b",
+            "secondary-fixed": "#9eefff",
+            "secondary-container": "#98edfd",
+            "outline": "#70797a",
+            "surface-container-high": "#dae9ff",
+            "on-primary-container": "#8fc4cd",
+            "tertiary": "#2b3638",
+            "on-error": "#ffffff",
+            "coral-accent": "#E88D90",
+            "surface-bright": "#f8f9ff",
+            "on-primary-fixed-variant": "#144e56",
+            "tertiary-fixed": "#d9e5e7",
+            "inverse-on-surface": "#e9f1ff",
+            "primary-container": "#1a525a",
+            "surface-container-lowest": "#ffffff",
+            "on-tertiary-fixed-variant": "#3d494b",
+            "surface-variant": "#d3e4fb",
+            "primary": "#003a42",
+            "on-primary": "#ffffff",
+            "tertiary-container": "#424d4f",
+            "secondary-fixed-dim": "#7fd3e3",
+            "on-tertiary-container": "#b2bdbf",
+            "on-background": "#0c1d2e",
+            "on-secondary": "#ffffff",
+            "success": "#38A169",
+            "surface-container-low": "#eef4ff",
+            "warning": "#D69E2E",
+            "background": "#f8f9ff",
+            "on-primary-fixed": "#001f24",
+            "on-surface-variant": "#40484a",
+            "error": "#E53E3E",
+            "primary-fixed-dim": "#9bcfd8",
+            "primary-fixed": "#b6ecf5",
+            "tertiary-fixed-dim": "#bdc9cb",
+            "sage-bg": "#F7F8FA",
+            "surface-container": "#e4efff"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "sm": "8px",
+            "unit": "4px",
+            "md": "16px",
+            "lg": "24px",
+            "xs": "4px",
+            "xl": "32px",
+            "container-max": "960px",
+            "gutter": "20px"
+          },
+          fontFamily: {
+            "sans": ["Inter", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "caption": ["Inter", "sans-serif"],
+            "headline-lg": ["Inter", "sans-serif"],
+            "headline-xl": ["Inter", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "headline-md": ["Inter", "sans-serif"],
+            "micro": ["Inter", "sans-serif"],
+            "label-bold": ["Inter", "sans-serif"]
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.4s ease-out forwards',
+            'slide-up': 'slideUp 0.5s ease-out forwards',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            slideUp: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #f8f9ff;
+      background-image: radial-gradient(at 0% 0%, hsla(186,33%,94%,1) 0px, transparent 50%),
+                        radial-gradient(at 100% 0%, hsla(232,54%,94%,1) 0px, transparent 50%),
+                        radial-gradient(at 100% 100%, hsla(186,33%,94%,1) 0px, transparent 50%);
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05);
+    }
+    
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .ai-gradient-text {
+      background: linear-gradient(135deg, #1a525a 0%, #006876 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .custom-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #003a42;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      margin-top: -8px;
+    }
+    
+    .custom-range::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 4px;
+      cursor: pointer;
+      background: #d3e4fb;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body class="text-on-surface pb-24 md:pb-8">
+<div id="root"></div>
+<script type="text/babel">
+    const { useState, useEffect, useCallback } = React;
+    const { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } = Recharts;
+
+    const API_BASE = ''; // Mock API
+
+    function Toast({ message, type, onDone }) {
+      useEffect(() => {
+        const t = setTimeout(onDone, 3000);
+        return () => clearTimeout(t);
+      }, [onDone]);
+      
+      const isSuccess = type === 'success';
+      
+      return (
+        <div className={`fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg z-50 animate-slide-up glass-card ${isSuccess ? 'border-l-4 border-success text-success' : 'border-l-4 border-error text-error'}`}>
+          <span className="material-symbols-outlined text-lg">{isSuccess ? 'check_circle' : 'error'}</span>
+          <span className="text-sm font-medium">{message}</span>
+        </div>
+      );
+    }
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('tracker');
+      const [logs, setLogs] = useState([]);
+      const [summary, setSummary] = useState('');
+      const [qaQuestion, setQaQuestion] = useState('');
+      const [qaAnswer, setQaAnswer] = useState('');
+      const [loadingReport, setLoadingReport] = useState(false);
+      const [loadingQA, setLoadingQA] = useState(false);
+      const [submitting, setSubmitting] = useState(false);
+      const [toasts, setToasts] = useState([]);
+
+      const [formData, setFormData] = useState({
+        date: new Date().toISOString().split('T')[0],
+        cycle_day: 1,
+        pain_level: 5,
+        primary_location: 'Pelvic',
+        gi_distress: false,
+        fatigue_level: 4,
+        notes: ''
+      });
+
+      const addToast = useCallback((message, type = 'success') => {
+        const id = Date.now();
+        setToasts(prev => [...prev, { id, message, type }]);
+      }, []);
+
+      const removeToast = useCallback((id) => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+      }, []);
+
+      const fetchLogs = async () => {
+        // Mock fetch
+        try {
+           setTimeout(() => {
+             setLogs([
+                { date: '2023-10-01', pain_level: 3, fatigue_level: 2 },
+                { date: '2023-10-02', pain_level: 5, fatigue_level: 4 },
+                { date: '2023-10-03', pain_level: 8, fatigue_level: 7 },
+             ]);
+           }, 500);
+        } catch (err) {
+          console.error('Failed to load symptom logs:', err);
+        }
+      };
+
+      useEffect(() => { fetchLogs(); }, []);
+
+      const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        setSubmitting(true);
+        try {
+          // Mock post
+          setTimeout(() => {
+             setLogs(prev => [...prev, { date: formData.date, pain_level: formData.pain_level, fatigue_level: formData.fatigue_level }]);
+             addToast('Symptom log saved successfully');
+             setFormData(prev => ({ ...prev, notes: '', pain_level: 5, fatigue_level: 4, gi_distress: false }));
+             setSubmitting(false);
+          }, 800);
+        } catch {
+          addToast('Connection error. Please try again.', 'error');
+          setSubmitting(false);
+        }
+      };
+
+      const handleGenerateSummary = async () => {
+        setLoadingReport(true);
+        setSummary('');
+        try {
+           // Mock AI
+           setTimeout(() => {
+              setSummary("Patient reports escalating pain (peak 8/10) and fatigue correlating with cycle days 2-4. Primary pain localized to pelvic region. No significant GI distress reported in current window. Recommend reviewing pain management protocol for peak days.");
+              setLoadingReport(false);
+           }, 1500);
+        } catch {
+          addToast('Error generating summary', 'error');
+          setLoadingReport(false);
+        }
+      };
+
+      const handleAskQuestion = async (e) => {
+        e.preventDefault();
+        if (!qaQuestion.trim()) return;
+        setLoadingQA(true);
+        setQaAnswer('');
+        try {
+          // Mock AI
+           setTimeout(() => {
+              setQaAnswer("Endometriosis can present with various early signs, commonly including severe pelvic pain during menstruation, pain during intercourse, and occasionally pain with bowel movements or urination. Fatigue and gastrointestinal issues are also frequently reported. It's important to discuss these symptoms with a healthcare provider for proper evaluation.");
+              setLoadingQA(false);
+           }, 1200);
+        } catch {
+          addToast('Error reaching AI assistant', 'error');
+          setLoadingQA(false);
+        }
+      };
+
+      const update = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
+
+      const tabs = [
+        { key: 'tracker', label: 'Tracker', icon: 'edit_calendar' },
+        { key: 'analytics', label: 'Analytics', icon: 'monitoring' },
+        { key: 'report', label: 'AI Brief', icon: 'stethoscope' },
+        { key: 'eduhub', label: 'Learn', icon: 'school' },
+      ];
+
+      return (
+        <div className="min-h-screen flex flex-col font-sans">
+          {/* Toasts */}
+          <div className="z-50">
+            {toasts.map(t => (
+              <Toast key={t.id} message={t.message} type={t.type} onDone={() => removeToast(t.id)} />
+            ))}
+          </div>
+
+          {/* Header */}
+          <header className="glass-nav sticky top-0 w-full z-40 px-4 md:px-6 py-3 shadow-sm">
+            <div className="max-w-container-max mx-auto flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary">
+                  <span className="material-symbols-outlined text-xl">healing</span>
+                </div>
+                <h1 className="text-xl font-bold text-primary tracking-tight">EndoTrack</h1>
+              </div>
+              <div className="flex items-center gap-3">
+                <button className="w-10 h-10 rounded-full hover:bg-surface-dim flex items-center justify-center text-primary transition-colors">
+                  <span className="material-symbols-outlined">notifications</span>
+                </button>
+                <div className="w-9 h-9 rounded-full bg-surface-dim border-2 border-primary-fixed overflow-hidden flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined">person</span>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <main className="flex-1 w-full max-w-3xl mx-auto px-4 md:px-6 py-6 md:py-8 animate-fade-in">
+            
+            {/* Desktop Tabs (Hidden on mobile) */}
+            <nav className="hidden md:flex bg-surface-container-low rounded-xl p-1 mb-8 shadow-sm">
+              {tabs.map(tab => (
+                <button
+                  key={tab.key}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    activeTab === tab.key 
+                      ? 'bg-white text-primary shadow-sm' 
+                      : 'text-on-surface-variant hover:bg-surface-dim/50'
+                  }`}
+                  onClick={() => setActiveTab(tab.key)}
+                >
+                  <span className="material-symbols-outlined text-[20px]">{tab.icon}</span>
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+
+            <div className="animate-slide-up">
+              {/* Daily Tracker */}
+              {activeTab === 'tracker' && (
+                <div className="glass-card rounded-2xl p-6 md:p-8">
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold text-primary mb-1">Log Today's Symptoms</h2>
+                    <p className="text-on-surface-variant text-sm">Track your daily experience to build a comprehensive health profile.</p>
+                  </div>
+
+                  <form onSubmit={handleFormSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-1.5 text-sm font-semibold text-primary">
+                          <span className="material-symbols-outlined text-[18px]">calendar_month</span> Date
+                        </label>
+                        <input
+                          type="date"
+                          className="w-full bg-surface border border-outline-variant rounded-xl px-4 py-2.5 text-on-surface focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
+                          value={formData.date}
+                          onChange={e => update('date', e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-1.5 text-sm font-semibold text-primary">
+                          <span className="material-symbols-outlined text-[18px]">cached</span> Cycle Day
+                        </label>
+                        <input
+                          type="number"
+                          className="w-full bg-surface border border-outline-variant rounded-xl px-4 py-2.5 text-on-surface focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
+                          min="1"
+                          max="45"
+                          value={formData.cycle_day}
+                          onChange={e => update('cycle_day', Number(e.target.value))}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-4 md:col-span-2 bg-surface-container-low p-5 rounded-xl border border-surface-dim">
+                        <div className="flex justify-between items-center">
+                          <label className="flex items-center gap-1.5 text-sm font-semibold text-primary">
+                            <span className="material-symbols-outlined text-[18px] text-coral-accent">vital_signs</span> Pain Severity
+                          </label>
+                          <span className="bg-white px-3 py-1 rounded-full text-sm font-bold text-primary shadow-sm border border-surface-dim">{formData.pain_level} / 10</span>
+                        </div>
+                        <input
+                          type="range"
+                          className="w-full custom-range"
+                          min="1"
+                          max="10"
+                          value={formData.pain_level}
+                          onChange={e => update('pain_level', Number(e.target.value))}
+                        />
+                        <div className="flex justify-between text-xs font-medium text-on-surface-variant px-1">
+                          <span>Mild</span>
+                          <span>Moderate</span>
+                          <span>Severe</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 md:col-span-2 bg-surface-container-low p-5 rounded-xl border border-surface-dim">
+                        <div className="flex justify-between items-center">
+                          <label className="flex items-center gap-1.5 text-sm font-semibold text-primary">
+                            <span className="material-symbols-outlined text-[18px] text-secondary">battery_2_bar</span> Fatigue Level
+                          </label>
+                          <span className="bg-white px-3 py-1 rounded-full text-sm font-bold text-primary shadow-sm border border-surface-dim">{formData.fatigue_level} / 10</span>
+                        </div>
+                        <input
+                          type="range"
+                          className="w-full custom-range"
+                          min="1"
+                          max="10"
+                          value={formData.fatigue_level}
+                          onChange={e => update('fatigue_level', Number(e.target.value))}
+                        />
+                        <div className="flex justify-between text-xs font-medium text-on-surface-variant px-1">
+                          <span>Low</span>
+                          <span>Moderate</span>
+                          <span>High</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="flex items-center gap-1.5 text-sm font-semibold text-primary">
+                          <span className="material-symbols-outlined text-[18px]">location_on</span> Primary Pain Location
+                        </label>
+                        <select
+                          className="w-full bg-surface border border-outline-variant rounded-xl px-4 py-2.5 text-on-surface focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
+                          value={formData.primary_location}
+                          onChange={e => update('primary_location', e.target.value)}
+                        >
+                          <option value="Pelvic">Pelvic / Lower Abdomen</option>
+                          <option value="Lower Back">Lower Back</option>
+                          <option value="Bowel/GI">Bowel / GI Tract</option>
+                          <option value="Legs/Hips">Legs / Hips (Nerve Pain)</option>
+                        </select>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label className="flex items-center gap-3 p-4 border border-outline-variant rounded-xl cursor-pointer hover:bg-surface-container-low transition-colors">
+                          <input
+                            type="checkbox"
+                            className="w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant"
+                            checked={formData.gi_distress}
+                            onChange={e => update('gi_distress', e.target.checked)}
+                          />
+                          <span className="text-sm font-medium text-on-surface">Experiencing GI Distress (Nausea, Severe Bloating, Bowel Pain)</span>
+                        </label>
+                      </div>
+
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="flex items-center gap-1.5 text-sm font-semibold text-primary">
+                          <span className="material-symbols-outlined text-[18px]">notes</span> Notes & Triggers
+                        </label>
+                        <textarea
+                          className="w-full bg-surface border border-outline-variant rounded-xl px-4 py-3 text-on-surface focus:ring-2 focus:ring-primary focus:border-primary transition-shadow resize-none"
+                          rows="3"
+                          value={formData.notes}
+                          onChange={e => update('notes', e.target.value)}
+                          placeholder="Missed school/work, specific flare triggers, medication taken..."
+                        />
+                      </div>
+
+                      <div className="md:col-span-2 pt-2">
+                        <button 
+                          type="submit" 
+                          className="w-full bg-primary hover:bg-primary-container text-on-primary font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed" 
+                          disabled={submitting}
+                        >
+                          {submitting ? (
+                            <><span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Saving...</>
+                          ) : (
+                            <><span className="material-symbols-outlined text-[20px]">check</span> Save Daily Log</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* Analytics */}
+              {activeTab === 'analytics' && (
+                <div className="glass-card rounded-2xl p-6 md:p-8">
+                  <div className="mb-6 flex justify-between items-start">
+                    <div>
+                      <h2 className="text-2xl font-bold text-primary mb-1">Cycle Analytics</h2>
+                      <p className="text-on-surface-variant text-sm">Visualize your pain and fatigue trends.</p>
+                    </div>
+                    {logs.length > 0 && (
+                      <div className="bg-primary-container text-on-primary-container text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 border border-primary/20 shadow-sm">
+                        <span className="material-symbols-outlined text-[16px]">bar_chart</span>
+                        {logs.length} entr{logs.length === 1 ? 'y' : 'ies'}
+                      </div>
+                    )}
+                  </div>
+
+                  {logs.length === 0 ? (
+                    <div className="bg-surface-container-low border border-dashed border-outline-variant rounded-2xl p-8 text-center flex flex-col items-center">
+                      <div className="w-16 h-16 bg-surface-dim rounded-full flex items-center justify-center text-primary mb-4">
+                        <span className="material-symbols-outlined text-3xl">trending_down</span>
+                      </div>
+                      <h3 className="text-lg font-bold text-primary mb-2">No data yet</h3>
+                      <p className="text-on-surface-variant text-sm max-w-sm">Log your first symptom entry in the Daily Tracker to see trends here.</p>
+                    </div>
+                  ) : (
+                    <div className="bg-white rounded-xl p-4 md:p-6 border border-surface-dim shadow-sm mt-4">
+                      <div className="h-[300px] md:h-[400px] w-full">
+                        <ResponsiveContainer>
+                          <LineChart data={logs} margin={{ top: 20, right: 20, bottom: 20, left: -20 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+                            <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#70797a' }} axisLine={{ stroke: '#c0c8ca' }} tickLine={false} dy={10} />
+                            <YAxis domain={[0, 10]} tick={{ fontSize: 12, fill: '#70797a' }} axisLine={false} tickLine={false} />
+                            <Tooltip
+                              contentStyle={{
+                                borderRadius: '12px',
+                                border: '1px solid #E2E8F0',
+                                boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                fontSize: '0.875rem',
+                                padding: '12px'
+                              }}
+                            />
+                            <Legend wrapperStyle={{ fontSize: '0.8125rem', paddingTop: '20px' }} iconType="circle" />
+                            <Line type="monotone" dataKey="pain_level" stroke="#E88D90" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 6, stroke: '#E88D90', strokeWidth: 2 }} name="Pain Severity" />
+                            <Line type="monotone" dataKey="fatigue_level" stroke="#006876" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 6, stroke: '#006876', strokeWidth: 2 }} name="Fatigue Level" />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* AI Doctor Brief */}
+              {activeTab === 'report' && (
+                <div className="glass-card rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+                  
+                  <div className="mb-6 relative z-10">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="material-symbols-outlined text-primary text-2xl">auto_awesome</span>
+                      <h2 className="text-2xl font-bold ai-gradient-text">AI Clinical Brief</h2>
+                    </div>
+                    <p className="text-on-surface-variant text-sm">Generate a concise, doctor-ready clinical summary from your logged history.</p>
+                  </div>
+
+                  {logs.length === 0 ? (
+                    <div className="bg-surface-container-low border-l-4 border-warning p-4 rounded-r-lg mb-6 flex gap-3 text-sm">
+                      <span className="material-symbols-outlined text-warning">info</span>
+                      <span className="text-on-surface">Please record at least one symptom entry in the Daily Tracker before generating a report.</span>
+                    </div>
+                  ) : (
+                    <div className="bg-primary/5 border border-primary/10 p-4 rounded-xl mb-6 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-primary">
+                          <span className="material-symbols-outlined">dataset</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-primary">Data Ready for Analysis</p>
+                          <p className="text-xs text-on-surface-variant">{logs.length} entries available</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    className="w-full bg-primary hover:bg-primary-container text-on-primary font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed mb-6 relative z-10"
+                    onClick={handleGenerateSummary}
+                    disabled={loadingReport || logs.length === 0}
+                  >
+                    {loadingReport ? (
+                      <><span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Analyzing Patterns...</>
+                    ) : (
+                      <><span className="material-symbols-outlined text-[20px]">summarize</span> Generate Brief for Doctor</>
+                    )}
+                  </button>
+
+                  {summary && (
+                    <div className="bg-white border border-surface-dim rounded-xl p-6 shadow-sm animate-fade-in relative z-10">
+                      <div className="flex items-center gap-2 mb-4 pb-4 border-b border-surface-dim">
+                        <span className="material-symbols-outlined text-secondary">psychology</span>
+                        <h3 className="font-bold text-primary">AI Synthesis Complete</h3>
+                      </div>
+                      <p className="text-on-surface text-sm leading-relaxed">{summary}</p>
+                      <div className="mt-6 flex justify-end">
+                        <button className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-secondary transition-colors bg-surface-container-low px-4 py-2 rounded-lg">
+                          <span className="material-symbols-outlined text-[18px]">ios_share</span> Export
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Educational Hub */}
+              {activeTab === 'eduhub' && (
+                <div className="glass-card rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                  <div className="absolute bottom-0 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl -mr-32 -mb-32 pointer-events-none"></div>
+
+                  <div className="mb-6 relative z-10">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="material-symbols-outlined text-secondary text-2xl">school</span>
+                      <h2 className="text-2xl font-bold text-primary">Endometriosis Learning Hub</h2>
+                    </div>
+                    <p className="text-on-surface-variant text-sm">Ask evidence-based questions about symptoms, diagnosis, and management.</p>
+                  </div>
+
+                  <form onSubmit={handleAskQuestion} className="mb-8 relative z-10">
+                    <div className="flex flex-col md:flex-row gap-3">
+                      <div className="relative flex-1">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+                        <input
+                          type="text"
+                          className="w-full pl-11 pr-4 py-3.5 bg-surface border border-outline-variant rounded-xl text-on-surface focus:ring-2 focus:ring-primary focus:border-primary shadow-sm"
+                          value={qaQuestion}
+                          onChange={e => setQaQuestion(e.target.value)}
+                          placeholder="e.g., What are early signs of endometriosis?"
+                        />
+                      </div>
+                      <button 
+                        type="submit" 
+                        className="bg-secondary hover:bg-secondary/90 text-on-secondary font-semibold py-3.5 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-70 whitespace-nowrap" 
+                        disabled={loadingQA || !qaQuestion.trim()}
+                      >
+                        {loadingQA ? (
+                          <><span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Searching...</>
+                        ) : (
+                          <><span className="material-symbols-outlined text-[20px]">send</span> Ask AI</>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+
+                  {qaAnswer && (
+                    <div className="bg-white border border-surface-dim rounded-xl p-6 shadow-sm animate-fade-in relative z-10">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center">
+                          <span className="material-symbols-outlined text-sm">smart_toy</span>
+                        </div>
+                        <h3 className="font-bold text-primary text-sm">AI Educator</h3>
+                      </div>
+                      <div className="text-on-surface text-sm leading-relaxed prose prose-sm max-w-none">
+                        {qaAnswer}
+                      </div>
+                    </div>
+                  )}
+
+                  {!qaAnswer && !loadingQA && (
+                    <div className="bg-surface-container-low border border-dashed border-outline-variant rounded-2xl p-8 text-center flex flex-col items-center mt-4">
+                      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-secondary shadow-sm mb-4">
+                        <span className="material-symbols-outlined text-3xl">menu_book</span>
+                      </div>
+                      <h3 className="text-lg font-bold text-primary mb-2">Your AI Health Educator</h3>
+                      <p className="text-on-surface-variant text-sm max-w-sm">Ask about symptoms, diagnostic pathways, treatment options, or daily management tips.</p>
+                      
+                      <div className="mt-6 flex flex-wrap justify-center gap-2">
+                        <span className="text-xs bg-white border border-surface-dim px-3 py-1.5 rounded-full text-on-surface-variant cursor-pointer hover:bg-surface transition-colors" onClick={() => setQaQuestion("How is endometriosis diagnosed?")}>How is it diagnosed?</span>
+                        <span className="text-xs bg-white border border-surface-dim px-3 py-1.5 rounded-full text-on-surface-variant cursor-pointer hover:bg-surface transition-colors" onClick={() => setQaQuestion("What are common trigger foods?")}>Common trigger foods?</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </main>
+
+          {/* Mobile Bottom Navigation */}
+          <nav className="md:hidden glass-nav fixed bottom-0 left-0 w-full z-40 rounded-t-2xl shadow-[0_-4px_16px_rgba(0,0,0,0.05)] px-2 pt-2 pb-6 flex justify-around items-center">
+            {tabs.map(tab => {
+              const isActive = activeTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex flex-col items-center justify-center w-16 transition-all duration-200 ${isActive ? 'scale-110' : 'scale-100 hover:opacity-80'}`}
+                >
+                  <div className={`w-12 h-8 flex items-center justify-center rounded-full mb-1 transition-colors ${isActive ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant'}`}>
+                    <span className={`material-symbols-outlined ${isActive ? 'filled' : ''}`}>{tab.icon}</span>
+                  </div>
+                  <span className={`text-[11px] font-semibold tracking-wide ${isActive ? 'text-primary' : 'text-on-surface-variant'}`}>{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          <footer className="text-center py-6 px-4 text-xs text-on-surface-variant max-w-2xl mx-auto mb-16 md:mb-0">
+            EndoTrack is a tracking tool and does not provide medical diagnosis. Always consult a healthcare professional.
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body></html>
